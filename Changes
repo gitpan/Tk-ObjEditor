@@ -1,0 +1,57 @@
+
+RCS file: /var/lib/cvs/Tk_ObjEditor/ObjEditor.pm,v
+Working file: ObjEditor.pm
+head: 2.2
+branch:
+locks: strict
+access list:
+symbolic names:
+	v2_001: 2.2
+	first: 1.1.1.1
+	ddumont: 1.1.1
+keyword substitution: kv
+total revisions: 4;	selected revisions: 4
+description:
+----------------------------
+revision 2.2
+date: 2003/02/14 13:00:07;  author: domi;  state: Exp;  lines: +41 -12
+- doc update
+- better test with tied stuff
+----------------------------
+revision 2.1
+date: 2003/02/12 12:46:55;  author: domi;  state: Exp;  lines: +63 -72
+- adapted for ObjScanner v2.001
+----------------------------
+revision 1.1
+date: 2002/11/13 13:28:21;  author: domi;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2002/11/13 13:28:21;  author: domi;  state: Exp;  lines: +0 -0
+no message
+=============================================================================
+
+RCS file: /var/lib/cvs/Tk_ObjEditor/ObjEditorDialog.pm,v
+Working file: ObjEditorDialog.pm
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	v2_001: 1.1.1.1
+	first: 1.1.1.1
+	ddumont: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2002/11/13 13:28:21;  author: domi;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2002/11/13 13:28:21;  author: domi;  state: Exp;  lines: +0 -0
+no message
+=============================================================================

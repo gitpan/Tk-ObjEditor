@@ -16,7 +16,7 @@ use Storable qw(dclone);
 @ISA = qw(Tk::Derived Tk::ObjScanner);
 *isa = \&UNIVERSAL::isa;
 
-$VERSION = sprintf "%d.%03d", q$Revision: 2.2 $ =~ /(\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%03d", q$Revision: 2.3 $ =~ /(\d+)\.(\d+)/;
 
 Tk::Widget->Construct('ObjEditor');
 
@@ -201,6 +201,8 @@ sub modify_widget
     my $db = $cw->DialogBox(-title => 'modify element',
                             -buttons => ["OK", "Cancel"]) ;
 
+    # Note: focus is taken over by DialogBox and given to "OK"
+
     $db->add('Label', -text => 'Please enter new value')->pack;
 
     my $textw;
@@ -212,15 +214,18 @@ sub modify_widget
       }
     else
       {
-        $db->add('Entry',-textvariable => $ref)->pack;
+        $db->add('Entry',-textvariable => $ref) ->pack ;
       }
 
+    # Show method should be enhanced to accept a "focus" parameter
+    # so focus could be given to the actual editing widget
     my $answer = $db->Show ;
 
     return 0 unless $answer eq "OK";
 
-    $$ref = $textw->get('1.0','end') if defined $textw ;
-
+    # the '- 1c' skips the newline erroneuosly added by the test widget
+    # Thanks Slaven
+    $$ref = $textw->get('1.0','end - 1c') if defined $textw ;
     return 1;
   }
 
@@ -408,12 +413,15 @@ the edition. This means that any reference to the internals of old
 data structure will stay on the old datastructure and will not be
 aware of the new values entered with this widget.
 
+Unforunately, undirect edition will break if the cloned data structure
+contains code reference.
+
 =item directly
 
-In this case, the data structure is not cloned. The edition is performed on the
-passed reference. Any reference to the internals of old
-data structure will be updated on-line. The drawback is that the user cannot 
-cancel (or undo) the edition.
+In this case, the data structure is not cloned. The edition is
+performed on the passed reference. Any reference to the internals of
+old data structure will be updated on-line. The drawback is that the
+user cannot cancel (or undo) the edition.
 
 =back
 
@@ -440,6 +448,9 @@ direct: Set to 1 if you want to perform direct edition.
 Like L<Tk::ObjScanner> ObjEditor does not detect recursive data
 structures. It will just keep on displaying the tree until the user
 gets tired of clicking on the HList items.
+
+ObjEditor cannot edit code reference. The module will break if you
+try undirect edition of data containing code references.
 
 =head1 AUTHOR
 
