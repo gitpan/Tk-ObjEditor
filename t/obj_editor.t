@@ -1,3 +1,4 @@
+# -*- cperl -*-
 # Before `make install' is performed this script should be runnable with
 use warnings FATAL => qw(all);
 # `make test'. After `make install' it should work as `perl test.pl'
@@ -118,7 +119,7 @@ my $w_menu = $mw->Frame(-relief => 'raised', -borderwidth => 2);
 $w_menu->pack(-fill => 'x');
 
 my $f = $w_menu->Menubutton(-text => 'File', -underline => 0) 
-  -> pack(side => 'left' );
+  -> pack(-side => 'left' );
 $f->command(-label => 'Quit',  -command => sub{$mw->destroy;} );
 
 print "creating dummy object \n" if $trace ;
@@ -128,23 +129,23 @@ print "ok ",$idx++,"\n";
 
 print "Creating some obj monitors\n" if $trace ;
 
-$mw->Label (text => "use right button to get editor menu")->pack;
+$mw->Label (-text => "use right button to get editor menu")->pack;
 my $fm = $mw ->Frame;
 $fm -> pack;
-$fm -> Label (text => 'Monitoring hash->{key1} value:')
+$fm -> Label (-text => 'Monitoring hash->{key1} value:')
   ->pack(qw/-side left/);
 my $mon =
-  $fm->Label(textvariable => \$dummy->{key1})->pack(qw/-side left/);
+  $fm->Label(-textvariable => \$dummy->{key1})->pack(qw/-side left/);
 
 print "Creating obj editor\n" if $trace ;
 my $objEd = $mw -> ObjEditor
   (
-   'caller' => $dummy,
-   direct => 1 ,
+   '-caller' => $dummy,
+   -direct => 1 ,
    #destroyable => 0,
-   title => 'test editor'
+   -title => 'test editor'
   )
-  -> pack(expand => 1, fill => 'both') ;
+  -> pack(-expand => 1, -fill => 'both') ;
 
 print "ok ",$idx++,"\n";
 

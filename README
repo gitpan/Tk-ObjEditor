@@ -12,7 +12,7 @@ Use the right button of the mouse of an element to modify its
 value. Depending on the context, you will also be able to delete the
 element or to add a sub-element.
 
-This module was written with perl5.8.0 and Tk 800.024
+This module was tested with perl5.8.2 and Tk 804.025
 
 See the embedded documentation in the module for more details.
 

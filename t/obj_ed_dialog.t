@@ -1,3 +1,4 @@
+# -*- cperl -*-
 # Before `make install' is performed this script should be runnable with
 use warnings FATAL => qw(all);
 # `make test'. After `make install' it should work as `perl test.pl'
@@ -65,7 +66,7 @@ my $dummy = new Toto ();
 print "ok ",$idx++,"\n";
 
 
-$mw->Label(text => "Here's the data that will be edited")->pack ;
+$mw->Label(-text => "Here's the data that will be edited")->pack ;
 
 my $text = $mw->Scrolled('ROText');
 $text->pack;
@@ -73,20 +74,20 @@ $text->insert('end',  Dumper($dummy));
 
 print "Creating some data monitors\n" if $trace ;
 
-$mw->Label (text => "use right button to get editor menu")->pack;
+$mw->Label (-text => "use right button to get editor menu")->pack;
 my $fm = $mw ->Frame;
 $fm -> pack;
-$fm -> Label (text => 'Monitoring hash->{key1} value:')
+$fm -> Label (-text => 'Monitoring hash->{key1} value:')
   ->pack(qw/-side left/);
 my $mon =
-  $fm->Label(textvariable => \$dummy->{key1})->pack(qw/-side left/);
+  $fm->Label(-textvariable => \$dummy->{key1})->pack(qw/-side left/);
 
 print "ok ",$idx++,"\n";
 
 my $direct = sub
   {
     print "Creating obj editor (direct edition)\n" if $trace ;
-    my $box = $mw -> ObjEditorDialog ('caller' => $dummy, direct => 1);
+    my $box = $mw -> ObjEditorDialog ('-caller' => $dummy, -direct => 1);
 
     $box -> Show;
     $text->delete('1.0','end');
@@ -96,7 +97,7 @@ my $direct = sub
 my $cloned = sub
   {
     print "Creating obj editor (not direct edition)\n" if $trace ;
-    my $box = $mw -> ObjEditorDialog ('caller' => $dummy);
+    my $box = $mw -> ObjEditorDialog ('-caller' => $dummy);
     my $new = $box -> Show;
     $text->delete('1.0','end');
     $text->insert('end',  Dumper($new));
@@ -106,10 +107,10 @@ my $bf = $mw->Frame->pack;
 
 ### TBD edit direct and indirect ????
 
-$bf->Button(-text => 'direct edit', command => $direct )
+$bf->Button(-text => 'direct edit', -command => $direct )
   ->pack(-side => 'right');
-$bf->Button(-text => 'edit', command => $cloned )->pack(-side => 'right');
-$bf->Button(-text => 'quit', command => sub{$mw->destroy;} )
+$bf->Button(-text => 'edit', -command => $cloned )->pack(-side => 'right');
+$bf->Button(-text => 'quit', -command => sub{$mw->destroy;} )
   ->pack(-side => 'left');
 
 MainLoop ; # Tk's
