@@ -12,7 +12,7 @@ use vars qw/$VERSION @ISA/;
 use base  qw(Tk::Derived Tk::DialogBox);
 *isa = \&UNIVERSAL::isa;
 
-$VERSION = sprintf "%d.%03d", q$Revision: 1.1 $ =~ /(\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%03d", q$Revision: 1.1.1.1 $ =~ /(\d+)\.(\d+)/;
 
 Tk::Widget->Construct('ObjEditorDialog');
 

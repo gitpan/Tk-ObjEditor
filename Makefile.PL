@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile
   (
    'NAME'	=> 'Tk::ObjEditor',
-   'VERSION' => '1.001',
+   'VERSION' => '2.001',
    'dist' => {COMPRESS=>'gzip -9f', SUFFIX => 'gz'},
    'PM' =>
    {
@@ -19,7 +19,7 @@ WriteMakefile
    {
     'Tk' => 0,
     'Storable' => 0,
-    'Tk::ObjScanner' => 0,
+    'Tk::ObjScanner' => 2.001 ,
     'Data::Dumper' => 0
    }
   );

@@ -6,6 +6,7 @@ use Tk::Frame;
 use Tk::ObjScanner;
 use Tk::Dialog ;
 use Tk::DialogBox ;
+use warnings ;
 use strict;
 
 use vars qw/$VERSION @ISA/;
@@ -15,7 +16,7 @@ use Storable qw(dclone);
 @ISA = qw(Tk::Derived Tk::ObjScanner);
 *isa = \&UNIVERSAL::isa;
 
-$VERSION = sprintf "%d.%03d", q$Revision: 1.1 $ =~ /(\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%03d", q$Revision: 2.2 $ =~ /(\d+)\.(\d+)/;
 
 Tk::Widget->Construct('ObjEditor');
 
@@ -38,13 +39,8 @@ sub InitObject
 
     $cw->SUPER::InitObject($args) ;
 
-    unless ($cw->{direct})
-      {
-        $cw->{menu}->command( -label => 'reset',
-                              -command => sub{$cw->reset});
-      }
-
-    $cw-> bind('<Button-3>', sub{$cw->modify_menu()}) ;
+    $cw->Subwidget('hlist')-> bind('<B3-ButtonRelease>', 
+                                   sub{$cw->modify_menu()}) ;
 
     $cw->{actions} = [];
 
@@ -66,15 +62,15 @@ sub modify_menu
 
     $cw->selectionClear() ; # clear all
     $cw->selectionSet($item) ;
-    #print "item $item to modify, button $b\n";
+    #print "item $item to modify\n";
 
     my $menu = $cw->Menu;
 
-    my $info = $cw->info("data",$item) ;
+    my $ref = $cw->info("data",$item)->{item_ref} ;
     my @children = $cw->infoChildren($item) ;
 
-    if (not $cw->isPseudoHash($info) and 
-        (isa($info,'ARRAY') or isa($info,'HASH')))
+    if (not $cw->isPseudoHash($$ref) and 
+        (isa($$ref,'ARRAY') or isa($$ref,'HASH')))
       {
         $menu -> add 
           (
@@ -83,7 +79,7 @@ sub modify_menu
            '-command' => sub {$cw->add_entry($item) ;}
           );
       }
-    elsif (not ref($info))
+    elsif (not ref($$ref))
       {
         $menu -> add 
           (
@@ -93,12 +89,24 @@ sub modify_menu
           );
       }
 
-    $menu -> add 
-      (
-       'command',
-       '-label' => 'delete', 
-       '-command' => sub {$cw->delete_entry($item) ;}
-      );
+    if ($item eq 'root')
+      {
+        $menu -> add 
+          (
+           'command',
+           '-label' => 'reset', 
+           '-command' => sub {$cw->reset ;}
+          ) unless $cw->{direct} ;
+      }
+    else
+      {
+        $menu -> add 
+          (
+           'command',
+           '-label' => 'delete', 
+           '-command' => sub {$cw->delete_entry($item) ;}
+          );
+        }
 
     $menu->Popup(-popover => 'cursor', -popanchor => 'nw');
 
@@ -137,73 +145,83 @@ sub modify_entry
     my $text = $cw->entrycget($item,'-text');
     my ($item_key) = ($text =~ m/^[\[\{](.*?)[\]\}]->/);
 
-    my $value= $cw->entrycget($item,'-data');
+    my $c_data = $cw->entrycget($item,'-data');
+    my $ref = $c_data->{item_ref} ;
 
-    $value=$cw->modify_widget($value, $is_text);
-    
-    return unless defined $value;
+    my $modified = $cw->modify_widget($ref, $is_text);
+
+    return unless $modified;
 
     # replace value in parent sdata structure
-    my $parent_item = $cw->info("parent",$item);
-    my $text_parent = $cw->entrycget($parent_item,"-text");
-    
-    my $parent_data = $text_parent =~ /^ROOT/ ? $cw->{chief}:
-      $cw->entrycget($parent_item,'-data');
+    $cw->update_item($item) ;
 
-    if (isa($parent_data,'HASH') )
-      {
-        $parent_data->{$item_key}=$value
-      }
-    elsif (isa($parent_data,'ARRAY'))
-      {
-        $parent_data->[$item_key]=$value ;
-      }
-    elsif(isa($parent_data,'SCALAR'))
-      {
-        $$parent_data=$value;
-      }
-    else
-      {
-        die "Internal error: Cannot update value";
-      }
+  }
+
+sub update_item
+  {
+    my ($cw,$item) = @_[0,1] ;
+    my $direction = $_[2] || '' ;
+
+    my $c_data = $cw->entrycget($item,'-data');
+    my $parent_item = $cw->info("parent",$item) ;
+    my $parent_c_data = $cw->entrycget($parent_item,'-data');
+    my $parent_ref = $item eq 'root' ? $cw->{chief}:
+      $parent_c_data->{tied_display} ? \tied($ {$parent_c_data->{item_ref}}) :
+        $parent_c_data->{item_ref} ;
+
 
     # update HList display
-    $text =~ s/('.*')|(undefined)/\'$value\'/ ;
+    my $text = $cw->describe_element($parent_ref,$c_data->{index}) ;
     $cw->entryconfigure($item,-text => $text);
-    $cw->entryconfigure($item,-data => $value);
+
+    # update parent if necessary
+    if ($parent_c_data->{tied_display} and $direction ne 'down')
+      {
+        $cw->update_item($parent_item,'up') ;
+      }
+
+    # update below if necessary
+    if ($c_data->{tied_display} and $direction ne 'up')
+      {
+        my $h = $cw->Subwidget('hlist');
+        foreach my $child ( $h->infoChildren($item) ) 
+          {
+            $cw->update_item($child, 'down');
+          }
+      }
     }
 
 sub modify_widget
   {
     my $cw = shift;
-    my $value = shift ;
+    my $ref = shift ;
     my $is_text = shift ;
 
     # construct popup dialog to change item value.
     my $db = $cw->DialogBox(-title => 'modify element',
                             -buttons => ["OK", "Cancel"]) ;
-    
+
     $db->add('Label', -text => 'Please enter new value')->pack;
-    
+
     my $textw;
-    if ($is_text or $value =~ /\n/)
+    if ($is_text or (defined $$ref and $$ref =~ /\n/))
       {
         $textw = $db->add('Text')->pack;
-        $textw -> insert('end',$value) ;
+        $textw -> insert('end',$$ref) ;
         $db->bind('<Return>',''); # remove Dialog Box binding on return
       }
     else
       {
-        $db->add('Entry',-textvariable => \$value)->pack;
+        $db->add('Entry',-textvariable => $ref)->pack;
       }
 
     my $answer = $db->Show ;
 
-    return undef unless $answer eq "OK";
+    return 0 unless $answer eq "OK";
 
-    $value = $textw->get('1.0','end') if defined $textw ;
+    $$ref = $textw->get('1.0','end') if defined $textw ;
 
-    return $value;
+    return 1;
   }
 
 sub add_entry
@@ -224,13 +242,14 @@ sub add_entry
 
     &$check; # for fun and for test
 
-    my $ref = $cw->entrycget($item,'-data');
+    my $ref_ref = $cw->entrycget($item,'-data')->{item_ref};
+    my $ref = $$ref_ref ;
 
     my $is_hash_like = isa($ref,'HASH');
 
     my $what = $is_hash_like ? 'key' : 'index' ;
     $db->add('Label', -text => "enter new $what")->pack;
-    
+
     my $key = $is_hash_like ? '' : scalar(@$ref) ;
 
     $db->add('Entry',-textvariable => \$key,
@@ -272,8 +291,8 @@ sub add_entry
     my $new;
     if    ($type eq 'hash')  { $new = {} ;}
     elsif ($type eq 'array') { $new = [];}
-    elsif ($type eq 'text')  { $new = $cw->modify_widget('',1);}
-    else                     { $new = $cw->modify_widget('',0) ;}
+    elsif ($type eq 'text')  { $cw->modify_widget(\$new,1);}
+    else                     { $cw->modify_widget(\$new,0) ;}
 
     return unless defined $new ;
 
@@ -281,24 +300,20 @@ sub add_entry
     $ref->[$key] = $new if isa($ref,'ARRAY') ;
 
     #recompute the text for parent widget
-    my $old = $cw->entrycget($item,'-text');
-    my $save = $old =~ s/->.*// ? $old : '' ;
-    my $text = $save. '-> '.$cw->element($ref);
+    my $text = $cw->describe_element(\$ref,$key) ;
     $cw->entryconfigure($item,'-text',$text);
-    
+
     #(re)display the children
     $cw->deleteOffsprings($item);
     $cw->displaySubItem($item,$ref);
-
-    }
+  }
 
 sub delete_entry
   {
     my $cw = shift;
     my $item = shift ;
 
-    my $text = $cw->entrycget($item,'-text');
-    my ($item_key) = ($text =~ m/^[\[\{](.*?)[\]\}]->/);
+    my $item_key = $cw->entrycget($item,'-data')->{index} || '';
 
     my $dialog = $cw->Dialog
       (
@@ -310,11 +325,11 @@ sub delete_entry
 
     return if $answer eq "No";
 
-    
+
     my $parent_item = $cw->info("parent",$item);
     my $text_parent = $cw->entrycget($parent_item,"-text");
-    
-    my $parent;
+
+    my $parent_ref;
     if ($text_parent !~ /^ROOT/)
       {
         chop $text_parent;
@@ -322,15 +337,15 @@ sub delete_entry
         $counter--;
         $text_parent = $text_parent.$counter.")";
         $cw->entryconfigure($parent_item,"-text",$text_parent);
-        $parent = $cw->entrycget($parent_item,'-data');
+        $parent_ref = $cw->entrycget($parent_item,'-data')->{item_ref};
       }
     else
       {
-        $parent = $cw->{chief};
+        $parent_ref = $cw->{chief};
       }
 
-    delete $parent->{$item_key} if isa($parent, 'HASH') ;
-    splice @$parent,$item_key,1  if isa($parent, 'ARRAY') ;
+    delete $$parent_ref->{$item_key} if isa($$parent_ref, 'HASH') ;
+    splice @$$parent_ref,$item_key,1  if isa($$parent_ref, 'ARRAY') ;
 
     $cw->deleteEntry($item);
   }
@@ -365,6 +380,10 @@ value of the item will be displayed in the HList.
 If the value is a scalar, the scalar will be displayed in the text window.
 (Which is handy if the value is a multi-line string)
 
+If you use the middle button and the item (either hash, array or
+scalar) is tied to an object , you will open the object hidden behind
+the tied variable.
+
 Use the right button of the mouse of an element to modify its
 value. Depending on the context, you will also be able to delete the
 element or to add a sub-element.
@@ -376,7 +395,8 @@ Demonstration" section.
 
 =head1 Direct or undirect edit
 
-As the constructor will pass a reference to the data structure to be edited, the data can be edited :
+As the constructor will pass a reference to the data structure to be
+edited, the data can be edited :
 
 =over
 
@@ -423,9 +443,9 @@ gets tired of clicking on the HList items.
 
 =head1 AUTHOR
 
-Dominique Dumont, Guillaume Degremont.
+Dominique Dumont (Dominique_Dumont@hp.com), Guillaume Degremont.
 
-Copyright (c) 1997-2001 Dominique Dumont, Guillaume Degremont. All
+Copyright (c) 1997-2003 Dominique Dumont, Guillaume Degremont. All
 rights reserved.  This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
 
