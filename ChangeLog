@@ -1,3 +1,12 @@
+2004-07-30  domi  <domi@komarr.grenoble.hp.com> v2.004
+
+	* ChangeLog, MANIFEST: Changed Changes to ChangeLog
+
+	* Makefile.PL: Require Tk::ObjScanner v2.010
+
+	* ObjEditor.pm: Disable display of internal tied data
+	Fix incorrect label update after 'add element' (fix rt ticket 6832)
+
 2003-12-01  Dominique Dumont  <domi@komarr.grenoble.hp.com> rev 2.003
 
 	* Adapted tests for Tk804.

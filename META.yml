@@ -1,14 +1,14 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Tk-ObjEditor
-version:      2.003
+version:      2.004
 version_from: 
 installdirs:  site
 requires:
     Data::Dumper:                  0
     Storable:                      0
     Tk:                            0
-    Tk::ObjScanner:                2.001
+    Tk::ObjScanner:                2.01
 
 distribution_type: module
 generated_by: ExtUtils::MakeMaker version 6.17

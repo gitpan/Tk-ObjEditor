@@ -4,15 +4,13 @@ the elements of a simple hash or array.
 The editor is a Tk::ObjScanner with additional function to edit data.
 
 When the user double clicks (with left button) on an item, the value
-of the item will be displayed in the HList. If the user use the middle
-button to open a tied item, the internals of the tied object will be
-displayed.
+of the item will be displayed in the HList.
 
 Use the right button of the mouse of an element to modify its
 value. Depending on the context, you will also be able to delete the
 element or to add a sub-element.
 
-This module was tested with perl5.8.2 and Tk 804.025
+This module was tested with perl5.8.4 and Tk 804.025
 
 See the embedded documentation in the module for more details.
 
@@ -20,7 +18,7 @@ Comments and suggestions are always welcome.
 
 Legal mumbo jumbo:
 
- Copyright (c) 1997-2003 Dominique Dumont. All rights reserved.
+ Copyright (c) 1997-2004 Dominique Dumont. All rights reserved.
  This program is free software; you can redistribute it and/or
  modify it under the same terms as Perl itself.
 

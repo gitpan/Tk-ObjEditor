@@ -3,7 +3,7 @@ package Tk::ObjEditor;
 use Carp ;
 use Tk::Derived ;
 use Tk::Frame;
-use Tk::ObjScanner;
+use Tk::ObjScanner 2.010 ;
 use Tk::Dialog ;
 use Tk::DialogBox ;
 use warnings ;
@@ -16,7 +16,7 @@ use Storable qw(dclone);
 @ISA = qw(Tk::Derived Tk::ObjScanner);
 *isa = \&UNIVERSAL::isa;
 
-$VERSION = sprintf "%d.%03d", q$Revision: 2.3 $ =~ /(\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%03d", q$Revision: 2.5 $ =~ /(\d+)\.(\d+)/;
 
 Tk::Widget->Construct('ObjEditor');
 
@@ -33,6 +33,8 @@ sub InitObject
     my $edited_data = $cw->{direct} ? $data : dclone($data) ;
 
     $args->{'caller'} = $edited_data ; # to pass to ObjScanner
+    $args->{'-show_tied'} = 0; # do not show tied data internal
+
 
     $args->{title} = ref($data).' editor' unless 
       (defined $args->{title} || defined $args->{-title});
@@ -223,7 +225,7 @@ sub modify_widget
 
     return 0 unless $answer eq "OK";
 
-    # the '- 1c' skips the newline erroneuosly added by the test widget
+    # the '- 1c' skips the newline erroneously added by the test widget
     # Thanks Slaven
     $$ref = $textw->get('1.0','end - 1c') if defined $textw ;
     return 1;
@@ -305,12 +307,12 @@ sub add_entry
     $ref->[$key] = $new if isa($ref,'ARRAY') ;
 
     #recompute the text for parent widget
-    my $text = $cw->describe_element(\$ref,$key) ;
-    $cw->entryconfigure($item,'-text',$text);
+    my $text = $cw->element(\$ref) ;
+    $cw->entryconfigure($item,'-text',$text );
 
     #(re)display the children
     $cw->deleteOffsprings($item);
-    $cw->displaySubItem($item,$ref);
+    $cw->displaySubItem($item); # by default do not display tied internals
   }
 
 sub delete_entry
@@ -333,24 +335,12 @@ sub delete_entry
 
     my $parent_item = $cw->info("parent",$item);
     my $text_parent = $cw->entrycget($parent_item,"-text");
-
-    my $parent_ref;
-    if ($text_parent !~ /^ROOT/)
-      {
-        chop $text_parent;
-        my $counter = chop $text_parent;
-        $counter--;
-        $text_parent = $text_parent.$counter.")";
-        $cw->entryconfigure($parent_item,"-text",$text_parent);
-        $parent_ref = $cw->entrycget($parent_item,'-data')->{item_ref};
-      }
-    else
-      {
-        $parent_ref = $cw->{chief};
-      }
+    my $parent_ref = $cw->entrycget($parent_item,'-data')->{item_ref};
 
     delete $$parent_ref->{$item_key} if isa($$parent_ref, 'HASH') ;
     splice @$$parent_ref,$item_key,1  if isa($$parent_ref, 'ARRAY') ;
+
+    $cw->entryconfigure($parent_item,"-text",$cw->element($parent_ref));
 
     $cw->deleteEntry($item);
   }
@@ -454,9 +444,9 @@ try undirect edition of data containing code references.
 
 =head1 AUTHOR
 
-Dominique Dumont (Dominique_Dumont@hp.com), Guillaume Degremont.
+Dominique Dumont (dominique.dumont@hp.com), Guillaume Degremont.
 
-Copyright (c) 1997-2003 Dominique Dumont, Guillaume Degremont. All
+Copyright (c) 1997-2004 Dominique Dumont, Guillaume Degremont. All
 rights reserved.  This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
 
