@@ -1,0 +1,42 @@
+Tk::ObjEditor provides a GUI to edit the attributes of an object or
+the elements of a simple hash or array.
+
+The editor is a L<Tk::ObjScanner> with additional function to edit data.
+
+When the user double clicks (with left button) on an item, the
+value of the item will be displayed in the HList.
+
+Use the right button of the mouse of an element to modify its
+value. Depending on the context, you will also be able to delete the
+element or to add a sub-element.
+
+This module was written with perl5.6.0 and Tk 800.022
+
+See the embedded documentation in the module for more details.
+
+Comments and suggestions are always welcome.
+
+Legal mumbo jumbo:
+
+ Copyright (c) 1997-2001 Dominique Dumont. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.
+
+ - Dominique Dumont
+   dominique_dumont@grenoble.hp.com
+
+---------------------------------------------------------------------
+INSTALLATION
+
+   	 gunzip -c <dist_file>.tar.gz | tar xvf -
+   	 cd <dist_directory>
+   	 perl Makefile.PL
+   	 make test          
+   	 make install
+
+
+
+
+
+
+
