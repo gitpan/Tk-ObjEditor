@@ -1,4 +1,9 @@
-2004-07-30  domi  <domi@komarr.grenoble.hp.com> v2.004
+2007-10-05  Dominique Dumont   2.005
+ 
+	* ObjEditor.pm (edit_object): new function so that obj_editor can
+	be invoked from non Tk program with one line.
+
+2004-07-30  domi   v2.004
 
 	* ChangeLog, MANIFEST: Changed Changes to ChangeLog
 
@@ -7,7 +12,7 @@
 	* ObjEditor.pm: Disable display of internal tied data
 	Fix incorrect label update after 'add element' (fix rt ticket 6832)
 
-2003-12-01  Dominique Dumont  <domi@komarr.grenoble.hp.com> rev 2.003
+2003-12-01  Dominique Dumont rev 2.003
 
 	* Adapted tests for Tk804.
 

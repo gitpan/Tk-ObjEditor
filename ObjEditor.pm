@@ -16,9 +16,30 @@ use Storable qw(dclone);
 @ISA = qw(Tk::Derived Tk::ObjScanner);
 *isa = \&UNIVERSAL::isa;
 
-$VERSION = sprintf "%d.%03d", q$Revision: 2.5 $ =~ /(\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%03d", q$Revision: 2.6 $ =~ /(\d+)\.(\d+)/;
 
 Tk::Widget->Construct('ObjEditor');
+
+sub edit_object
+  {
+    require Tk ;
+    import Tk;
+    my $object = shift ;
+
+    my $mw = MainWindow-> new ;
+    $mw->geometry('+10+10');
+    my $s = $mw -> ObjEditor
+      (
+       '-caller' => $object, 
+       -direct => 1,
+       -title => 'object editor'
+      );
+
+    $s -> pack(-expand => 1, -fill => 'both') ;
+    $s->OnDestroy(sub{$mw->destroy;}) ;
+
+    &MainLoop ; # Tk's
+  }
 
 sub InitObject
   {
@@ -32,7 +53,7 @@ sub InitObject
 
     my $edited_data = $cw->{direct} ? $data : dclone($data) ;
 
-    $args->{'caller'} = $edited_data ; # to pass to ObjScanner
+    $args->{'-caller'} = $edited_data ; # to pass to ObjScanner
     $args->{'-show_tied'} = 0; # do not show tied data internal
 
 
@@ -202,6 +223,7 @@ sub modify_widget
     # construct popup dialog to change item value.
     my $db = $cw->DialogBox(-title => 'modify element',
                             -buttons => ["OK", "Cancel"]) ;
+    $cw->{current_dialog} = $db ;
 
     # Note: focus is taken over by DialogBox and given to "OK"
 
@@ -210,13 +232,16 @@ sub modify_widget
     my $textw;
     if ($is_text or (defined $$ref and $$ref =~ /\n/))
       {
-        $textw = $db->add('Text')->pack;
+        $textw = $db->add('Text')->pack(-expand => 1, -fill => 'both');
         $textw -> insert('end',$$ref) ;
         $db->bind('<Return>',''); # remove Dialog Box binding on return
+	$db->Advertise('Entry' => $textw ) ;
       }
     else
       {
-        $db->add('Entry',-textvariable => $ref) ->pack ;
+	my $entry = $db->add('Entry',-textvariable => $ref)
+	  ->pack(-expand => 1, -fill => 'x') ;
+	$db->Advertise('Entry' => $entry ) ;
       }
 
     # Show method should be enhanced to accept a "focus" parameter
@@ -225,7 +250,7 @@ sub modify_widget
 
     return 0 unless $answer eq "OK";
 
-    # the '- 1c' skips the newline erroneously added by the test widget
+    # the '- 1c' skips the newline erroneously added by the text widget
     # Thanks Slaven
     $$ref = $textw->get('1.0','end - 1c') if defined $textw ;
     return 1;
@@ -345,6 +370,12 @@ sub delete_entry
     $cw->deleteEntry($item);
   }
 
+# used for tests
+sub get_current_dialog 
+  {
+    my $self = shift ;
+    return $self->{current_dialog} ;
+  }
 
 1;
 
@@ -367,7 +398,9 @@ Tk::ObjEditor - Tk composite widget Obj editor
 This widget provides a GUI to edit the attributes of an object or the
 elements of a simple hash or array.
 
-The editor is a L<Tk::ObjScanner> with additional function to edit data.
+The editor is a L<Tk::ObjScanner> with additional function to edit
+data.  The editor can be used in an autonomous way with the
+C<edit_object> function.
 
 When the user double clicks (with left button) on an item, the
 value of the item will be displayed in the HList.
@@ -421,17 +454,29 @@ user cannot cancel (or undo) the edition.
 
 =item *
 
-caller: The ref of the object or hash or array to edit (mandatory).
+-caller: The ref of the object or hash or array to edit (mandatory).
 
 =item *
 
-title: the title of the menu created by the editor (optionnal)
+-title: the title of the menu created by the editor (optionnal)
 
 =item *
 
-direct: Set to 1 if you want to perform direct edition.
+-direct: Set to 1 if you want to perform direct edition.
 
 =back
+
+=head1 Autonomous widget
+
+=head2 edit_object( data )
+
+This function is not exported and must be called this way:
+
+  Tk::ObjEditor::edit_object($data);
+
+This function will load Tk and pop up an editor widget. When the user
+destroy the widget (with C<File -> destroy> menu), the user code is
+resumed.
 
 =head1 CAVEATS
 
@@ -446,7 +491,7 @@ try undirect edition of data containing code references.
 
 Dominique Dumont (dominique.dumont@hp.com), Guillaume Degremont.
 
-Copyright (c) 1997-2004 Dominique Dumont, Guillaume Degremont. All
+Copyright (c) 1997-2004,2007 Dominique Dumont, Guillaume Degremont. All
 rights reserved.  This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
 

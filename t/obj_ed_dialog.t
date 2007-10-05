@@ -113,7 +113,15 @@ $bf->Button(-text => 'edit', -command => $cloned )->pack(-side => 'right');
 $bf->Button(-text => 'quit', -command => sub{$mw->destroy;} )
   ->pack(-side => 'left');
 
-MainLoop ; # Tk's
+if ($trace) 
+    {
+	MainLoop ; # Tk's
+    }
+  else 
+    {
+	$mw->idletasks;
+	$mw->after(1000); # sleep 300ms
+    }
 
 print "ok ",$idx++,"\n";
 

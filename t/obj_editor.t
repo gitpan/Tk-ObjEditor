@@ -147,9 +147,60 @@ my $objEd = $mw -> ObjEditor
   )
   -> pack(-expand => 1, -fill => 'both') ;
 
+$mw->idletasks;
 print "ok ",$idx++,"\n";
 
-MainLoop ; # Tk's
+sub scan
+  {
+    my $topName = shift ;
+    $objEd->yview($topName) ;
+
+    foreach my $c ($objEd->infoChildren($topName))
+      {
+        $objEd->displaySubItem($c);
+        scan($c);
+	#print $c,"\n";
+	last if $c =~ /root\|2/ ;
+      }
+    $mw->idletasks;
+  }
+
+sub refresh
+    {
+	$mw->idletasks;
+	$mw->after(1000); # sleep 300ms
+    }
+
+if ($trace)
+  {
+    MainLoop ; # Tk's
+  }
+else
+  {
+    scan('root');
+    $objEd->displaySubItem('root|1');
+
+
+    # modify string entry
+    my $menu = $objEd->modify_menu('root|1') ; # string entry
+    refresh ;
+
+
+    # since call to Dialog is blocking, we must pass this sub ref to a
+    # timer
+    my $sub = sub { 
+	my $dialog = $objEd->get_current_dialog ;
+	$dialog->Subwidget('Entry')->insert(0,'yada') ;
+	refresh ;
+	$dialog->Subwidget('B_OK')->invoke ;
+    } ;
+    $mw->after(1000,$sub) ;
+
+    # Invoked Dialog will block until B_OK is pressed
+    $menu->invoke(1) ;
+    refresh ;
+
+  }
 
 print "ok ",$idx++,"\n";
 
