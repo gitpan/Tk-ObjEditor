@@ -8,16 +8,14 @@ use warnings FATAL => qw(all);
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..4\n"; }
-END {print "not ok 1\n" unless $loaded;}
 use Tk ;
 use ExtUtils::testlib ; 
 use Tk::ObjEditorDialog ;
 use Tk::ROText ;
 use Data::Dumper ;
-$loaded = 1;
-my $idx = 1;
-print "ok ",$idx++,"\n";
+
+use Test::More tests => 4 ;
+
 my $trace = shift || 0 ;
 
 ######################### End of black magic.
@@ -57,71 +55,72 @@ sub new
 package main;
 
 use strict ;
+
+ok(1,"compiled") ;
+
 my $toto ;
-my $mw = MainWindow-> new ;
+my $mw = eval { MainWindow-> new };
 
-print "creating dummy object \n" if $trace ;
-my $dummy = new Toto ();
-
-print "ok ",$idx++,"\n";
+ SKIP:{
+      skip "Cannot open Tk",3 unless defined $mw;
 
 
-$mw->Label(-text => "Here's the data that will be edited")->pack ;
+      my $dummy = new Toto ();
 
-my $text = $mw->Scrolled('ROText');
-$text->pack;
-$text->insert('end',  Dumper($dummy));
+      ok($dummy, "created dummy object") ;
 
-print "Creating some data monitors\n" if $trace ;
+      $mw->Label(-text => "Here's the data that will be edited")->pack ;
 
-$mw->Label (-text => "use right button to get editor menu")->pack;
-my $fm = $mw ->Frame;
-$fm -> pack;
-$fm -> Label (-text => 'Monitoring hash->{key1} value:')
-  ->pack(qw/-side left/);
-my $mon =
-  $fm->Label(-textvariable => \$dummy->{key1})->pack(qw/-side left/);
+      my $text = $mw->Scrolled('ROText');
+      $text->pack;
+      $text->insert('end',  Dumper($dummy));
 
-print "ok ",$idx++,"\n";
+      $mw->Label (-text => "use right button to get editor menu")->pack;
+      my $fm = $mw ->Frame;
+      $fm -> pack;
+      $fm -> Label (-text => 'Monitoring hash->{key1} value:')
+	->pack(qw/-side left/);
+      my $mon =
+	$fm->Label(-textvariable => \$dummy->{key1})->pack(qw/-side left/);
 
-my $direct = sub
-  {
-    print "Creating obj editor (direct edition)\n" if $trace ;
-    my $box = $mw -> ObjEditorDialog ('-caller' => $dummy, -direct => 1);
+      ok(1,"Created some data monitors");
 
-    $box -> Show;
-    $text->delete('1.0','end');
-    $text->insert('end',  Dumper($dummy));
-  };
+      my $direct = sub
+	{
+	    print "Creating obj editor (direct edition)\n" if $trace ;
+	    my $box = $mw -> ObjEditorDialog ('-caller' => $dummy, -direct => 1);
 
-my $cloned = sub
-  {
-    print "Creating obj editor (not direct edition)\n" if $trace ;
-    my $box = $mw -> ObjEditorDialog ('-caller' => $dummy);
-    my $new = $box -> Show;
-    $text->delete('1.0','end');
-    $text->insert('end',  Dumper($new));
-  };
+	    $box -> Show;
+	    $text->delete('1.0','end');
+	    $text->insert('end',  Dumper($dummy));
+	};
 
-my $bf = $mw->Frame->pack;
+      my $cloned = sub
+	{
+	    print "Creating obj editor (not direct edition)\n" if $trace ;
+	    my $box = $mw -> ObjEditorDialog ('-caller' => $dummy);
+	    my $new = $box -> Show;
+	    $text->delete('1.0','end');
+	    $text->insert('end',  Dumper($new));
+	};
 
-### TBD edit direct and indirect ????
+      my $bf = $mw->Frame->pack;
 
-$bf->Button(-text => 'direct edit', -command => $direct )
-  ->pack(-side => 'right');
-$bf->Button(-text => 'edit', -command => $cloned )->pack(-side => 'right');
-$bf->Button(-text => 'quit', -command => sub{$mw->destroy;} )
-  ->pack(-side => 'left');
+      ### TBD edit direct and indirect ????
 
-if ($trace) 
-    {
-	MainLoop ; # Tk's
-    }
-  else 
-    {
-	$mw->idletasks;
-	$mw->after(1000); # sleep 300ms
-    }
+      $bf->Button(-text => 'direct edit', -command => $direct )
+	->pack(-side => 'right');
+      $bf->Button(-text => 'edit', -command => $cloned )->pack(-side => 'right');
+      $bf->Button(-text => 'quit', -command => sub{$mw->destroy;} )
+	->pack(-side => 'left');
 
-print "ok ",$idx++,"\n";
+      if ($trace) {
+	  MainLoop ;		# Tk's
+      } else {
+	  $mw->idletasks;
+	  $mw->after(1000);	# sleep 300ms
+      }
 
+      ok(1,"mainloop done") ;
+
+  }

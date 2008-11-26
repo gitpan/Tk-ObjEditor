@@ -4,8 +4,9 @@ use ExtUtils::MakeMaker;
 WriteMakefile
   (
    'NAME'	=> 'Tk::ObjEditor',
-   'VERSION' => '2.006',
+   'VERSION' => '2.007',
    'dist' => {COMPRESS=>'gzip -9f', SUFFIX => 'gz'},
+   LICENSE => 'perl',
    'PM' =>
    {
     'ObjEditor.pm'   => '$(INST_LIB)/Tk/ObjEditor.pm',
@@ -14,7 +15,7 @@ WriteMakefile
    },
    ($] >= 5.005 ?
     (ABSTRACT   => 'PTk widget to edit object or data',
-     AUTHOR     => 'Dominique Dumont (domi@barrayar.grenoble.hp.com)') : ()),
+     AUTHOR     => 'Dominique Dumont (dominique.dumont@hp.com)') : ()),
    'PREREQ_PM' =>
    {
     'Tk' => 0,

@@ -16,7 +16,7 @@ use Storable qw(dclone);
 @ISA = qw(Tk::Derived Tk::ObjScanner);
 *isa = \&UNIVERSAL::isa;
 
-$VERSION = sprintf "%d.%03d", q$Revision: 2.6 $ =~ /(\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%03d", q$Revision: 2.7 $ =~ /(\d+)\.(\d+)/;
 
 Tk::Widget->Construct('ObjEditor');
 
@@ -490,6 +490,8 @@ try undirect edition of data containing code references.
 =head1 AUTHOR
 
 Dominique Dumont (dominique.dumont@hp.com), Guillaume Degremont.
+
+=head1 LICENSE
 
 Copyright (c) 1997-2004,2007 Dominique Dumont, Guillaume Degremont. All
 rights reserved.  This program is free software; you can redistribute

@@ -1,14 +1,17 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Tk-ObjEditor
-version:      2.006
-version_from: 
-installdirs:  site
-requires:
+--- #YAML:1.0
+name:                Tk-ObjEditor
+version:             2.007
+abstract:            PTk widget to edit object or data
+license:             perl
+author:              
+    - Dominique Dumont (dominique.dumont@hp.com)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
     Data::Dumper:                  0
     Storable:                      0
     Tk:                            0
     Tk::ObjScanner:                2.01
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30_01
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3
