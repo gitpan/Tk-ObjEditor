@@ -1,17 +1,34 @@
---- #YAML:1.0
-name:                Tk-ObjEditor
-version:             2.007
-abstract:            PTk widget to edit object or data
-license:             perl
-author:              
-    - Dominique Dumont (dominique.dumont@hp.com)
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    Data::Dumper:                  0
-    Storable:                      0
-    Tk:                            0
-    Tk::ObjScanner:                2.01
+---
+abstract: 'Tk composite widget Obj editor'
+author:
+  - 'Dominique Dumont'
+build_requires:
+  Data::Dumper: '0'
+  Test::More: '0'
+  Tie::Hash: '0'
+  Tie::Scalar: '0'
+  Tk::ROText: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.142060'
+license: perl
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tk-ObjEditor
+requires:
+  Carp: '0'
+  Scalar::Util: '1.01'
+  Storable: '0'
+  Tk: '0'
+  Tk::Derived: '0'
+  Tk::Dialog: '0'
+  Tk::DialogBox: '0'
+  Tk::Frame: '0'
+  Tk::ObjScanner: '2.010'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tk-ObjEditor
+  homepage: https://github.com/dod38fr/perl-tk-objeditor
+  repository: https://github.com/dod38fr/perl-tk-objeditor.git
+version: '2.008'

@@ -1,9 +1,13 @@
-2007-10-05  Dominique Dumont   2.005
+2.008 2014-07-31
+
+    * refreshed the code and tests. No other functional changes
+
+2.005 2007-10-05
  
 	* ObjEditor.pm (edit_object): new function so that obj_editor can
 	be invoked from non Tk program with one line.
 
-2004-07-30  domi   v2.004
+2.004 2004-07-30
 
 	* ChangeLog, MANIFEST: Changed Changes to ChangeLog
 
@@ -12,16 +16,12 @@
 	* ObjEditor.pm: Disable display of internal tied data
 	Fix incorrect label update after 'add element' (fix rt ticket 6832)
 
-2003-12-01  Dominique Dumont rev 2.003
+2.003 2003-12-01
 
 	* Adapted tests for Tk804.
 
+2.002 2003-02-14
 
-revision 2.2
-date: 2003/02/14 13:00:07;  author: domi;  state: Exp;  lines: +41 -12
-- doc update
-- better test with tied stuff
-----------------------------
-revision 2.1
-date: 2003/02/12 12:46:55;  author: domi;  state: Exp;  lines: +63 -72
-- adapted for ObjScanner v2.001
+    * doc update
+    * better test with tied stuff
+
