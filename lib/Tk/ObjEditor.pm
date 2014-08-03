@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Tk::ObjEditor;
-$Tk::ObjEditor::VERSION = '2.008';
+$Tk::ObjEditor::VERSION = '2.009';
 use Carp;
 use Tk::Derived;
 use Tk::Frame;
@@ -443,7 +443,7 @@ user cannot cancel (or undo) the edition.
 
 =item *
 
--title: the title of the menu created by the editor (optionnal)
+-title: the title of the menu created by the editor (optional)
 
 =item *
 

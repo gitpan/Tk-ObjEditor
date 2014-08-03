@@ -1,3 +1,7 @@
+2.009 2014-08-03
+
+    * fix nb of test skipped when Tk window cannot be created
+
 2.008 2014-07-31
 
     * refreshed the code and tests. No other functional changes

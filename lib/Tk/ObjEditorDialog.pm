@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Tk::ObjEditorDialog;
-$Tk::ObjEditorDialog::VERSION = '2.008';
+$Tk::ObjEditorDialog::VERSION = '2.009';
 use strict;
 use warnings;
 
@@ -85,7 +85,7 @@ caller: The ref of the object or hash or array to edit (mandatory).
 
 =item *
 
-title: the title of the menu created by the editor (optionnal)
+title: the title of the menu created by the editor (optional)
 
 =item *
 

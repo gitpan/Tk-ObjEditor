@@ -99,7 +99,7 @@ my $toto;
 my $mw = eval { MainWindow->new };
 
 SKIP: {
-    skip "Cannot open Tk", 3 unless defined $mw;
+    skip "Cannot open Tk", 4 unless defined $mw;
 
     my $w_menu = $mw->Frame( -relief => 'raised', -borderwidth => 2 );
     $w_menu->pack( -fill => 'x' );
